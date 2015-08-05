@@ -14,4 +14,4 @@
 3. Also I have `gen_and_run_html.py` script. `main()` function from `tournament.py` will give current data for each round to the `gen_and_run_html.py`. And this script will draw names and winner's or looser's lines using html.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; So, to begin `python tournament.py`. It can be like this:
-![Example tournament](https://cloud.githubusercontent.com/assets/5002732/8395720/da150f96-1d89-11e5-9e5f-3acde2896c72.png)
+![example db.cfg](https://cloud.githubusercontent.com/assets/5002732/9095807/056c37f4-3bc2-11e5-9d53-886951efadee.png)
