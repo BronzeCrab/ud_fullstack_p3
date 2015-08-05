@@ -13,5 +13,6 @@
 2. Next, `main()` will hold the tournament, will print initial standings of the players, results after each round and pairs for each round.
 3. Also I have `gen_and_run_html.py` script. `main()` function from `tournament.py` will give current data for each round to the `gen_and_run_html.py`. And this script will draw names and winner's or looser's lines using html.
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; So, to begin `python tournament.py`. It can be like this:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; So, to begin `python tournament.py`.
+In order to create db or connect to existing please specify your postgres username, password and db name in special file, that i've created in the root folder of the project - `db.cfg`. Please full it like this, without any quotes os whitespaces:
 ![example db.cfg](https://cloud.githubusercontent.com/assets/5002732/9095807/056c37f4-3bc2-11e5-9d53-886951efadee.png)
