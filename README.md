@@ -15,5 +15,6 @@
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; So, to begin `python tournament.py`.
 
-In order to create db or connect to existing please specify your postgres username, password and db name in special file, that i've created in the root folder of the project - `db.cfg`. Please full it like this, without any quotes os whitespaces:
+&nbsp;&nbsp;&nbsp;In order to create db or connect to existing please specify your postgres username, password and db name in special file, that i've created in the root folder of the project - `db.cfg`. Please full it like this, without any quotes os whitespaces:
 ![example db.cfg](https://cloud.githubusercontent.com/assets/5002732/9095807/056c37f4-3bc2-11e5-9d53-886951efadee.png)
+`database_setup.py` will pasrse `db.cfg`.
