@@ -6,9 +6,7 @@ I've decided to make a web app about different sports - my favorite are grapplin
 ### To run my project:
 
 1. First of all, I've decided to use postgres, so you should be able to create a postgres db on your machine. When you've done with it, please fill file `db.cfg` with postgres username, password and db name. Please fill it like this, without any quotes or whitespaces:
-
 ![example db.cfg](https://cloud.githubusercontent.com/assets/5002732/9095807/056c37f4-3bc2-11e5-9d53-886951efadee.png)
-
 when you'll run `database_setup.py` will pasrse `db.cfg`. and take your data  from it.
 2. When you've filled `db.cfg` with your username, pass and db name, you are ready to run `python database_setup.py`, it will create db schema - 3 tables `category`,`item` and `userinfo`.
 3. Run `python lotsofitems.py` to fill the db with my data under dummy user, this user will have id=1
