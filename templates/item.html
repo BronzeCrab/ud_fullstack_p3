@@ -1,0 +1,43 @@
+{% extends "categories.html" %}
+{% block item_head %}
+<!-- <link href="//vjs.zencdn.net/4.12/video-js.css" rel="stylesheet">
+<script src="//vjs.zencdn.net/4.12/video.js"></script> -->
+{% endblock %}
+{% block item %}
+
+<h3>{{ item.name }}</h3>
+<p>{{ item.description }}</p>
+{% if item.name == "Backflip" %}
+<img src="../../../static/images/backflip.gif"></img>
+{% endif %}
+{% if item.name == "Frontflip" %}
+<img src="../../../static/images/frontflip.gif"></img>
+{% endif %}
+{% if item.name == "Flyak" %}
+<img src="../../../static/images/flyak.jpg"></img>
+{% endif %}
+{% if item.name == "Takedowns" %}
+<iframe width="420" height="315"
+src="http://www.youtube.com/embed/Gcarl3Igv_A">
+</iframe>
+<br>
+{% endif %}
+{% if item.name == "Chokehold" %}
+<iframe width="420" height="315"
+src="http://www.youtube.com/embed/Lhk4EZl4jjE">
+</iframe>
+<br>
+{% endif %}
+{% if item.name == "Joint lock" %}
+<iframe width="420" height="315"
+src="http://www.youtube.com/embed/8wNQ5UGLQHk">
+</iframe>
+<br>
+{% endif %}
+<a href= '{{url_for('editItem', category_name = category.name , item_name = item.name)}}'>Edit</a>
+<a href= '{{url_for('deleteItem', category_name = category.name , item_name = item.name)}}'>Delete</a>
+{% endblock %}
+{% block scripts %}
+<script src="../../../static/assets/js/skel.min.js"></script>
+<script src="../../../static/assets/js/main.js"></script>
+{% endblock %}

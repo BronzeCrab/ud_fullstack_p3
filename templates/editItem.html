@@ -1,0 +1,29 @@
+{% extends "categories.html" %}
+{% block editItem %}
+
+<h1>Editing item {{item.name}}</h1>
+
+<form action="{{url_for('editItem', category_name = category.name, item_name = item.name)}}" method="post">
+
+<p>Specify the category:</p>
+
+<select name="category">
+	{% for category in categories %}
+	<option value="{{ category.name }}">{{ category.name }}</option>
+	{% endfor %}
+</select>
+<br>
+<p>Specify the name:</p>
+<input type = 'text' size='30' name = 'name'>
+<br>
+<p>Specify the description:</p>
+<input type = 'text' size='30' name = 'description'>
+<input type='submit' value='Edit'>
+<a href= '{{url_for('showItems', category_name = category.name )}}'>Cancel</a>
+
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="../../../../static/assets/js/skel.min.js"></script>
+<script src="../../../../static/assets/js/main.js"></script>
+{% endblock %}

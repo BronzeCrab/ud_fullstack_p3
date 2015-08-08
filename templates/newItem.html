@@ -1,0 +1,32 @@
+{% extends "categories.html" %}
+{% block newItem %}
+<h1>Make new item:</h1>
+
+{% if category_name is not defined %}
+<form action= "{{url_for('newItem')}}" method = 'POST'>
+<p>Specify the category:</p>
+<select name="category">
+	{% for category in categories %}
+	<option value="{{ category.name }}">{{ category.name }}</option>
+	{% endfor %}
+</select>
+<br>
+{% else %}
+<form action= "{{url_for('newItem', category_name = category_name)}}" method = 'POST'>
+{% endif %}
+<p>Specify the name:</p>
+<input type = 'text' size='30' name = 'name'>
+<br>
+<p>Specify the description:</p>
+<input type = 'text' size='30' name = 'description'>
+<br>
+<input type='submit' value='Create'>
+
+<a href= '{{url_for('showCategories')}}'>Cancel</a>
+
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="../../../static/assets/js/skel.min.js"></script>
+<script src="../../../static/assets/js/main.js"></script>
+{% endblock %}

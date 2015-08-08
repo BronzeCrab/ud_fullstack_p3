@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<!-- skel-baseline v3.0.0-dev | (c) n33 | skel.io | MIT licensed -->
+<html>
+	<head>
+		<title>Item catalog</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!-- <link rel="stylesheet" href="assets/css/main.css" /> -->
+		<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}">
+		{% block login_head %}
+		{% endblock %}
+		{% block item_head %}
+		{% endblock %}
+	</head>
+	<body id="top">
+
+		<!-- Header -->
+			<header id="header">
+				<h1><a href="/categories">Item catalog</a></h1>
+				{% if not ifLoginGp and not ifLoginFb %}
+				<a href="/login">Login</a>
+				{% endif %}
+				{% if ifLoginGp %}
+				<a href="/gdisconnect">Logout</a>
+				{% endif %}
+				{% if ifLoginFb %}
+				<a href="/fbdisconnect">Logout</a>
+				{% endif %}
+				<a href="#nav">Categories</a>
+			</header>
+
+		<!--MESSAGE FLASHING EXAMPLE -->
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+
+		<ul>
+		{% for message in messages %}
+		  <li><strong>{{message}}</strong></li>
+		  {% endfor %}
+		</ul>
+		{% endif %}
+		{% endwith %}
+
+		<!-- Nav -->
+			<nav id="nav">
+				<ul class="links">
+					<!-- Adding my categories to nav -->
+					{% block nav %}
+					{% for category in categories %}
+					<li><a href="/categories/{{ category.name }}/">{{category.name}}</a></li>
+					{% endfor %}
+					{% endblock %}
+<!-- 				<li><a href="#top">Top</a></li>
+					<li><a href="#content">Content</a></li>
+					<li><a href="#elements">Elements</a></li>
+					<li><a href="#grid">Grid System</a></li> -->
+				</ul>
+				<ul class="actions vertical">
+<!-- 				<li><a href="http://skel.io" class="button special fit">Download</a></li>
+					<li><a href="http://skel.io" class="button fit">Documentation</a></li> -->
+				</ul>
+			</nav>
+		{% if lastItemsAndCategories %}
+		<!-- Banner -->
+			<section id="banner">
+				<h2>Hi, this is a catalog<br>of different sports</h2>
+				<p>You can create new sport activity if you are logged in. Or you can see current list of sports,<br>
+				   just click on the "categories" button.
+				</p>
+				<ul class="actions">
+					<li><a href="/categories/newCategory/" class="button special">Create new sport</a></li>
+				</ul>
+			</section>
+		{% endif %}
+		<!-- Main -->
+			<div id="main" class="container">
+
+				<!-- Items -->
+					<div class="row">
+						<section class="12u">
+						{% if lastItemsAndCategories %}
+						<p>
+						<a href="/categories/newItem/" class="button special">Add Item</a>
+						</p>
+						<h2>Latest items</h2>
+						{% for elem in lastItemsAndCategories %}						
+						<p>{{ elem.item_name }} ({{ elem.category_name }})</p>
+						{% endfor %}
+						{% endif %}
+						{% block items %}
+						{% endblock %}
+						{% block item %}
+						{% endblock %}
+						{% block newItem %}
+						{% endblock %}
+						{% block deleteItem %}
+						{% endblock %}
+						{% block editItem %}
+						{% endblock %}
+						{% block newCategory %}
+						{% endblock %}
+						{% block deleteCategory %}
+						{% endblock %}
+						{% block login_body %}
+						{% endblock %}
+						</section>
+					</div>
+			</div>
+
+		<!-- Scripts -->
+			{% if lastItemsAndCategories %}
+			<script src="../static/assets/js/skel.min.js"></script>
+			<script src="../static/assets/js/main.js"></script>
+			{% else %}
+			{% block scripts %}
+			{% endblock %}
+			{% endif %}
+	</body>
+</html>

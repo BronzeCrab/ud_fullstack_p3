@@ -1,0 +1,18 @@
+/*My adding for login page*/
+h2 {
+	text-align: center;
+}
+.border_div {
+border: 1px solid #dcdcdc;
+border-radius: 25px;
+padding-left: 2em;
+padding-bottom: 2em;
+}
+/*google button*/
+#signInButton {
+	text-align: center;
+}
+#FBbutton{
+	
+	text-align: center;
+}
