@@ -13,6 +13,7 @@ when you'll run `database_setup.py` will pasrse `db.cfg`. and take your data  fr
 4. Now run `python project.py`. And check out my project. In fact, I have one problem: video doesn't work right via Chrome, don't know why, but Chrome freezes when I'm trying to load page with video (from `Grappling` category). It says 'waiting for localhost and don't preload video. Please help me with this thing.<br>
 ![problem with chrome](https://cloud.githubusercontent.com/assets/5002732/9152021/75c10604-3e21-11e5-8d7e-6404be080838.png)<br>
 See? when I'm going to for example `/categories/Grappling/Takedowns` then all freezes and i can't delete or edit this item.
+
 ### Description of project:
 
 1. I've used <a href="https://github.com/n33/skel">skel</a> to make responsive site. So I have beatiful sidebar for my categories.
