@@ -1,5 +1,4 @@
 # ud_fullstack_p3
-# project 3
 
 I've decided to make a web app about different sports - my favorite are grappling and acrobatics. So there are two categories and few items inside them.
 
