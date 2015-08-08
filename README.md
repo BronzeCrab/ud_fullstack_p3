@@ -10,7 +10,7 @@ I've decided to make a web app about different sports - my favorite are grapplin
 when you'll run `database_setup.py` will pasrse `db.cfg`. and take your data  from it.
 2. When you've filled `db.cfg` with your username, pass and db name, you are ready to run `python database_setup.py`, it will create db schema - 3 tables `category`,`item` and `userinfo`.
 3. Run `python lotsofitems.py` to fill the db with my data under dummy user, this user will have id=1
-4. Now run `python project.py`. And check out my project. In fact, I have one problem: <video> doesn't work right via Chrome, don't know why, but Chrome freezes when I'm trying to load page with video (from `Grappling` category). It says 'waiting for localhost and don't preload video. Please help me with this thing.
+4. Now run `python project.py`. And check out my project. In fact, I have one problem: video doesn't work right via Chrome, don't know why, but Chrome freezes when I'm trying to load page with video (from `Grappling` category). It says 'waiting for localhost and don't preload video. Please help me with this thing.
 
 ### Description of project:
 
