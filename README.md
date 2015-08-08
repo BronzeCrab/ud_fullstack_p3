@@ -9,9 +9,7 @@ I've decided to make a web app about different sports - my favorite are grapplin
 when you'll run `database_setup.py` will pasrse `db.cfg`. and take your data  from it.
 2. When you've filled `db.cfg` with your username, pass and db name, you are ready to run `python database_setup.py`, it will create db schema - 3 tables `category`,`item` and `userinfo`.
 3. Run `python lotsofitems.py` to fill the db with my data under dummy user, this user will have id=1
-4. Now run `python project.py`. And check out my project. In fact, I have one problem: video doesn't work right via Chrome, don't know why, but Chrome freezes when I'm trying to load page with video (from `Grappling` category). It says 'waiting for localhost and don't preload video. Please help me with this thing.<br>
-![problem with chrome](https://cloud.githubusercontent.com/assets/5002732/9152021/75c10604-3e21-11e5-8d7e-6404be080838.png)<br>
-See? when I'm going to for example `/categories/Grappling/Takedowns` then all freezes and i can't delete or edit this item.
+4. Now run `python project.py`. And check out my project. 
 
 ### Description of project:
 
@@ -19,4 +17,4 @@ See? when I'm going to for example `/categories/Grappling/Takedowns` then all fr
 ![view of app](https://cloud.githubusercontent.com/assets/5002732/9152037/4e7ad876-3e22-11e5-8081-bb10cdb68f81.png)<br>
 2. I've added login via facebook and google and local permission system: only that user who created item and category can delete or edit items or categories.
 3. One can't create two items with same names inside one category. Only user with id that match to user_id field inside the item or category table can edit or delete items.
-4. I've added gifs and videos to my items. I don't know if it right desicion to load them not from db but directly from my project folder - but i do it like this, just put links inside html to my `/static/videos` directory.
+4. I've added gifs and videos to my items. I don't know if it right desicion to load them not from db but directly from my project folder - but i do it like this, just put links inside html to my `/static/images` directory. And videos i've loaded just like links to yuotube insude `iframe` tags.
