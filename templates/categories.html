@@ -17,14 +17,17 @@
 		<!-- Header -->
 			<header id="header">
 				<h1><a href="/categories">Item catalog</a></h1>
-				{% if not ifLoginGp and not ifLoginFb %}
+				{% if not ifLogin %}
 				<a href="/login">Login</a>
-				{% endif %}
-				{% if ifLoginGp %}
+				{% else %}
+				{% if ifLogin == "google" %}
 				<a href="/gdisconnect">Logout</a>
+				{% set ifLogin = "google" %}
 				{% endif %}
-				{% if ifLoginFb %}
+				{% if ifLogin == "facebook" %}
 				<a href="/fbdisconnect">Logout</a>
+				{% set ifLogin = "facebook" %}
+				{% endif %}
 				{% endif %}
 				<a href="#nav">Categories</a>
 			</header>

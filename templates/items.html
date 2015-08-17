@@ -1,4 +1,14 @@
 {% extends "categories.html" %}
+
+{% if ifLogin is defined %}
+{% if ifLogin == "google" %}
+{% set ifLogin = "google" %}
+{% endif %}
+{% if ifLogin == "facebook" %}
+{% set ifLogin = "facebook" %}
+{% endif %}
+{% endif %}
+
 {% block items %}
 
 <a href="/categories/{{ categoryToShow.name }}/newItem/" class="button special">Add Item</a>

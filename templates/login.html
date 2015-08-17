@@ -41,12 +41,12 @@ function signInCallback(authResult) {
   if (authResult['code']) {
     // Hide the sign-in button now that the user is authorized
     $('#signinButton').attr('style', 'display: none');
-    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main restaurants page
+    // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main page
     $.ajax({
       type: 'POST',
       //gconnect function should be defined on server
       url: '/gconnect?state={{STATE}}',
-      // we don't want jquey to process data to string
+      // we don't want jquery to process data to string
       processData: false,
       // we will send to the server one-time use code
       data: authResult['code'],

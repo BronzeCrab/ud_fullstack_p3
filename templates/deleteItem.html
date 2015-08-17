@@ -1,4 +1,15 @@
 {% extends "categories.html" %}
+
+{% if ifLogin is defined %}
+{% if ifLogin == "google" %}
+{% set ifLogin = "google" %}
+{% endif %}
+{% if ifLogin == "facebook" %}
+{% set ifLogin = "facebook" %}
+{% endif %}
+{% endif %}
+
+
 {% block deleteItem %}
 
 <h1>A you shure you want to delete {{item.name}}?</h1>
