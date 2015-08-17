@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for,\
-     request, redirect, flash, jsonify
+    request, redirect, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
@@ -12,6 +12,7 @@ import httplib2
 import json
 from flask import make_response
 import requests
+from database_setup import parseCFG
 
 app = Flask(__name__)
 
@@ -22,19 +23,34 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = "Item Catalog"
 
 # Connect to db
+# parsing cfg file:
 
-engine = create_engine('postgresql://austinnikov:123123@localhost/mydatabase')
+res = parseCFG()
+eng_str = 'postgresql://{}:{}@localhost/{}'.format(res[0], res[1], res[2])
+
+engine = create_engine(eng_str)
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# Login
+# Login function
 
 
 @app.route('/login')
 def showLogin():
+    """Showing login page. Returns template for login.
+
+    Passes two variables to template - 'state' - generated random token and
+    'categories'. Variable 'categories' is necessary in template, because
+    user must be able to see the list of all categories, even if he isn't
+    logged in yet. So to provide this I'm sending this variable to the
+    template. Variable 'state' is necessary to run js script which is
+    for google login (sending ajax to google server).
+    """
     categories = session.query(Category).all()
+    # create random token for further use to
+    # validate connection to google server
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -44,6 +60,11 @@ def showLogin():
 
 
 def createUser(login_session):
+    """Creating new user. Returns id of user.
+
+    Args:
+      login_session: the dictionary with user's data
+    """
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
     session.add(newUser)
@@ -52,12 +73,12 @@ def createUser(login_session):
     return user.id
 
 
-def getUserInfo(user_id):
-    user = session.query(User).filter_by(id=user_id).one()
-    return user
-
-
 def getUserID(email):
+    """Returns user id using email.
+
+    Args:
+      email: email of user
+    """
     try:
         user = session.query(User).filter_by(email=email).one()
         return user.id
@@ -296,12 +317,14 @@ def fbdisconnect():
 
 @app.route('/categories/JSON/')
 def categoriesJSON():
+    """Returns json with names of current categories"""
     categories = session.query(Category).all()
     return jsonify(Categories=[i.serialize for i in categories])
 
 
 @app.route('/categories/<category_name>/JSON/')
 def categoryItemsJSON(category_name):
+    """Returns json with info about items in specific category"""
     category = session.query(Category).filter_by(name=category_name).one()
     items = session.query(Item).filter_by(category_id=category.id).all()
     return jsonify(Items=[i.serialize for i in items])
@@ -309,6 +332,7 @@ def categoryItemsJSON(category_name):
 
 @app.route('/categories/<category_name>/<item_name>/JSON/')
 def categoryItemJSON(category_name, item_name):
+    """Returns json with info about specific item in specific category"""
     category = session.query(Category).filter_by(name=category_name).one()
     item = session.query(Item).filter_by(
         category_id=category.id, name=item_name).one()
@@ -317,40 +341,75 @@ def categoryItemJSON(category_name, item_name):
 # ===use jsonify to return JSON===
 
 
+def checkLogin():
+    """Returns string contains login info or nothing if not logged"""
+    if 'username' not in login_session:
+        return
+    elif 'facebook_id' in login_session:
+        ifLogin = 'facebook'
+        return ifLogin
+    elif 'gplus_id' in login_session:
+        ifLogin = 'google'
+        return ifLogin
+
+
 @app.route('/')
 @app.route('/categories/')
 def showCategories():
+    """Returns basic starting html template"""
     categories = session.query(Category).all()
     # get last 10 items
     lastItems = session.query(Item).order_by(Item.id.desc()).limit(10)
     # I should get also name of the category for current item to display
+    # last 10 items and names of their categories in brackets. I'll fill
+    # list 'LastItemsAndCategories' with names of items and categories and
+    # then pass it to the template.
     lastItemsAndCategories = []
     for item in lastItems:
         category = session.query(Category).filter_by(id=item.category_id).one()
         lastItemsAndCategories.append(
             {"item_name": item.name, "category_name": category.name})
-    # checking if user is logged in to change Login button on Logout button
-    if 'username' not in login_session:
-        return render_template('categories.html', categories=categories,
-                               lastItemsAndCategories=lastItemsAndCategories)
-    elif 'facebook_id' in login_session:
-        return render_template('categories.html', categories=categories,
-                               lastItemsAndCategories=lastItemsAndCategories,
-                               ifLoginFb=True)
-    elif 'gplus_id' in login_session:
-        return render_template('categories.html', categories=categories,
-                               lastItemsAndCategories=lastItemsAndCategories,
-                               ifLoginGp=True)
+
+    # === old  variant but possible ===
+    # checking if user is logged in to change Login button on Logout button:
+    # if 'username' not in login_session:
+    #     return render_template('categories.html', categories=categories,
+    #                            lastItemsAndCategories=lastItemsAndCategories)
+    # elif 'facebook_id' in login_session:
+    #     return render_template('categories.html', categories=categories,
+    #                            lastItemsAndCategories=lastItemsAndCategories,
+    #                            ifLogin=True)
+    # elif 'gplus_id' in login_session:
+    #     return render_template('categories.html', categories=categories,
+    #                            lastItemsAndCategories=lastItemsAndCategories,
+    #                            ifLogin=True)
+
+    # === old  variant but possible ===
+
+    # Checking if user is logged. Passing
+    # variable ifLogin to template. Then in the template I'll decide if it
+    # necessary to change 'Login' button to the 'Logout' button.
+
+    ifLogin = checkLogin()
+    return render_template('categories.html', categories=categories,
+                           lastItemsAndCategories=lastItemsAndCategories,
+                           ifLogin=ifLogin)
 
 
 @app.route('/categories/newCategory/', methods=['GET', 'POST'])
 def newCategory():
+    """Returns redirect or template in case of GET"""
+    # Only logged users can create new categories. Because I have to know
+    # email of the user to identify him and authorize him in the future.
+    # (for example authorize for deleting category).
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == "POST":
         try:
             category = session.query(Category).filter_by(
                 name=request.form['name']).one()
+        # There will be exception if category with such name wasn't
+        # been found
         except:
             # create new category if there isn't any old with this name
             newCategory = Category(name=request.form['name'],
@@ -359,34 +418,63 @@ def newCategory():
             session.commit()
             flash("new category created!")
             return redirect(url_for('showCategories'))
+        # if there wasn't any exception - then this name is already
+        # token. So do nothing.
         else:
             flash("category wasn't created - this name is already token!")
             return redirect(url_for('newCategory'))
+    # It's the case for GET request:
     else:
         categories = session.query(Category).all()
-        return render_template('newCategory.html', categories=categories)
+        # trying to figure out if user has been logged to change
+        # 'Login' button to 'Logout'.
+        # In order to do that use checkLogin() func,
+        # result of it - ifLogin variable to pass
+        # it to child template and then set variable
+        # in child template and then pass it to
+        # parent template 'categories.html', because child template
+        # 'newCategory.html' extends parent template 'categories.html'
+        # and I can't figure out another way of swiching Login button
+        # to Logout button when rendering child templates.
+        # Hmm... maybe there is a better way?
+        ifLogin = checkLogin()
+        return render_template('newCategory.html',
+                               categories=categories,
+                               ifLogin=ifLogin)
 
 
 @app.route('/categories/<category_name>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_name):
+    """Returns redirect or template in case of GET
+
+    Args:
+      category_name: name of category to delete
+    """
+    # only logged users can delete categories
     if 'username' not in login_session:
         return redirect('/login')
-    # if there is no 'username' key in login_session dict:
+    # if user is logged and he was the creator
+    # of the category then he can delete it:
     deleteCategory = session.query(
         Category).filter_by(name=category_name).one()
     if login_session['user_id'] == deleteCategory.user_id:
         categories = session.query(Category).all()
-        print deleteCategory
         if request.method == "POST":
             session.delete(deleteCategory)
             session.commit()
             flash("category was deleted!")
             return redirect(url_for('showCategories'))
         else:
+            # trying to figure out if user has been logged to change
+            # 'Login' button to 'Logout'. Same thing as in `newCategory`
+            # function
+            ifLogin = checkLogin()
             return render_template(
                 'deleteCategory.html',
                 category=deleteCategory,
-                categories=categories)
+                categories=categories,
+                ifLogin=ifLogin)
+
     else:
         flash("You can't delete another's category")
         return redirect(url_for('showCategories'))
@@ -395,7 +483,8 @@ def deleteCategory(category_name):
 @app.route('/categories/<category_name>/newItem/', methods=['GET', 'POST'])
 @app.route('/categories/newItem/', methods=['GET', 'POST'])
 def newItem(category_name=None):
-    """ Create new item in any directory """
+    """ Create new item in specific category.
+    Returns newItem.html in case of GET """
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == "POST":
@@ -430,14 +519,17 @@ def newItem(category_name=None):
         categories = session.query(Category).all()
         # if we got category name, then it was the first route (from some
         # category)
+        ifLogin = checkLogin()
         if category_name:
             return render_template(
                 'newItem.html',
                 categories=categories,
-                category_name=category_name)
+                category_name=category_name,
+                ifLogin=ifLogin)
         else:
             # otherwise i'll have to get category's name from the user
-            return render_template('newItem.html', categories=categories)
+            return render_template('newItem.html', categories=categories,
+                                   ifLogin=ifLogin)
 
 
 @app.route(
@@ -446,11 +538,16 @@ def newItem(category_name=None):
         'GET',
         'POST'])
 def deleteItem(category_name, item_name):
+    """ Delete new item in specific category.
+    Returns deleteItem.html in case of GET """
     if 'username' not in login_session:
         return redirect('/login')
+    # if user is logged then get category by name and then item by
+    # category's id and name
     category = session.query(Category).filter_by(name=category_name).one()
     itemTodel = session.query(Item).filter_by(
         category_id=category.id, name=item_name).one()
+    # if user's id is the same go on
     if login_session['user_id'] == itemTodel.user_id:
         categories = session.query(Category).all()
         if request.method == "POST":
@@ -458,12 +555,16 @@ def deleteItem(category_name, item_name):
             session.commit()
             flash("item was deleted!")
             return redirect(url_for('showItems', category_name=category.name))
+        # in case of GET just render 'deleteItem.html'
         else:
+            ifLogin = checkLogin()
             return render_template(
                 'deleteItem.html',
                 category=category,
                 item=itemTodel,
-                categories=categories)
+                categories=categories,
+                ifLogin=ifLogin)
+    # otherwise returns to 'items.html'
     else:
         flash("You can't delete another's item")
         return redirect(url_for('showItems', category_name=category.name))
@@ -475,6 +576,8 @@ def deleteItem(category_name, item_name):
         'GET',
         'POST'])
 def editItem(category_name, item_name):
+    """ Edit item in specific category.
+    Returns 'editItem.html' in case of GET """
     if 'username' not in login_session:
         return redirect('/login')
     category = session.query(Category).filter_by(name=category_name).one()
@@ -483,13 +586,16 @@ def editItem(category_name, item_name):
     if login_session['user_id'] == itemToEdit.user_id:
         categories = session.query(Category).all()
         if request.method == "POST":
-            # there two variants: category was changed or not.
+            # there two variants: category was been changed or not.
             # First condider the
             # case when category wasn't changed
             if category.name == request.form['category']:
                 if request.form['name']:
+                    # editing name and description of item. Category
+                    # hasn't been changed
                     itemToEdit.name = request.form['name']
                     itemToEdit.description = request.form['description']
+                # if field 'name' is not defined then redirect
                 else:
                     flash("item's name can't be empty")
                     return redirect(
@@ -503,7 +609,7 @@ def editItem(category_name, item_name):
                 # new item to new category
                 session.delete(itemToEdit)
                 # figuring out category to add new Item (i must figure out
-                # category's id)
+                # category's id to find item)
                 category = session.query(Category).filter_by(
                     name=request.form['category']).one()
                 itemToAdd = Item(name=request.form['name'],
@@ -514,11 +620,14 @@ def editItem(category_name, item_name):
             flash("item was edited!")
             return redirect(url_for('showItems', category_name=category.name))
         else:
+            # in case of GET:
+            ifLogin = checkLogin()
             return render_template(
                 'editItem.html',
                 category=category,
                 item=itemToEdit,
-                categories=categories)
+                categories=categories,
+                ifLogin=ifLogin)
     else:
         flash("You can't edit this item!")
         return redirect(url_for('showItems', category_name=category.name))
@@ -526,27 +635,36 @@ def editItem(category_name, item_name):
 
 @app.route('/categories/<category_name>/')
 def showItems(category_name):
+    """ Show all items in specific category.
+    Returns 'items.html' """
     categoryToShow = session.query(
         Category).filter_by(name=category_name).one()
     items = session.query(Item).filter_by(category_id=categoryToShow.id).all()
+    # I need 'categories' variable to feed to sidebar with all categories
     categories = session.query(Category).all()
+    ifLogin = checkLogin()
     return render_template('items.html', items=items,
                            categories=categories,
                            amountOfItems=len(items),
-                           categoryToShow=categoryToShow)
+                           categoryToShow=categoryToShow,
+                           ifLogin=ifLogin)
 
 
 @app.route('/categories/<category_name>/<item_name>/')
 def showItem(category_name, item_name):
+    """ Show specific item in specific category.
+    Returns 'item.html' """
     category = session.query(Category).filter_by(name=category_name).one()
     item = session.query(Item).filter_by(
         category_id=category.id, name=item_name).one()
     categories = session.query(Category).all()
+    ifLogin = checkLogin()
     return render_template(
         'item.html',
         item=item,
         categories=categories,
-        category=category)
+        category=category,
+        ifLogin=ifLogin)
 
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
